@@ -38,7 +38,7 @@ func send(questions []Question) {
 			parameters.Add("entry."+fmt.Sprint(val.ID), val.Answers[rand.Intn(len(val.Answers))])
 		}
 		if val.Type == 0 || val.Type == 1 {
-			parameters.Add("entry."+fmt.Sprint(val.ID), "test text")
+			parameters.Add("entry."+fmt.Sprint(val.ID), "Y0U H4V3 B33N PWN3D")
 		}
 		if val.Type == 4 {
 			randIter := rand.Intn(len(val.Answers))
@@ -95,7 +95,6 @@ func main() {
 
 	for i := 0; i < items.Len(); i++ {
 		tmp := reflect.ValueOf(items.Slice(i, i+1).Index(0).Interface())
-		//fmt.Println(tmp)
 
 		typ, err := strconv.ParseInt(strings.Trim(fmt.Sprintf("%v", tmp.Slice(3, 4)), "[]"), 10, 32)
 		if err != nil {
@@ -107,32 +106,37 @@ func main() {
 			fmt.Println(err)
 		}
 
-		questionInfo := reflect.ValueOf(reflect.ValueOf(tmp.Slice(4, 5).Index(0).Interface()).Slice(0, 1).Index(0).Interface())
-		isRequired, err := strconv.ParseBool(strings.Trim(fmt.Sprintf("%v", questionInfo.Slice(2, 3)), "[]"))
-		if err != nil {
-			fmt.Println(err)
-		}
+		questionType := reflect.ValueOf(reflect.ValueOf(tmp.Slice(3, 4).Interface()).Index(0).Interface())
 
-		str := fmt.Sprintf("%v", questionInfo.Slice(0, 1))
-		str = str[1 : len(str)-5]
-		str = strings.Replace(str, ".", "", 1)
-		id, err := strconv.ParseInt(str, 10, 64)
-		if err != nil {
-			fmt.Println(err)
-		}
+		if questionType.Float() != 6 {
+			questionInfo := reflect.ValueOf(reflect.ValueOf(tmp.Slice(4, 5).Index(0).Interface()).Slice(0, 1).Index(0).Interface())
 
-		var answers []string
-		if typ == 2 || typ == 4 {
-			ans := reflect.ValueOf(questionInfo.Slice(1, 2).Index(0).Interface())
-			for i := 0; i < ans.Len(); i++ {
-				answer := reflect.ValueOf(ans.Slice(i, i+1).Index(0).Interface()).Index(0)
-				answers = append(answers, fmt.Sprintf("%v", answer))
+			isRequired, err := strconv.ParseBool(strings.Trim(fmt.Sprintf("%v", questionInfo.Slice(2, 3)), "[]"))
+			if err != nil {
+				fmt.Println(err)
 			}
-		} else {
-			answers = append(answers, "testString")
-		}
 
-		questions = append(questions, Question{int(id), isRequired, int(typ), name, answers})
+			str := fmt.Sprintf("%v", questionInfo.Slice(0, 1))
+			str = str[1 : len(str)-5]
+			str = strings.Replace(str, ".", "", 1)
+			id, err := strconv.ParseInt(str, 10, 64)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			var answers []string
+			if typ == 2 || typ == 4 {
+				ans := reflect.ValueOf(questionInfo.Slice(1, 2).Index(0).Interface())
+				for i := 0; i < ans.Len(); i++ {
+					answer := reflect.ValueOf(ans.Slice(i, i+1).Index(0).Interface()).Index(0)
+					answers = append(answers, fmt.Sprintf("%v", answer))
+				}
+			} else {
+				answers = append(answers, "testString")
+			}
+
+			questions = append(questions, Question{int(id), isRequired, int(typ), name, answers})
+		}
 	}
 
 	for _, val := range questions {
@@ -145,6 +149,7 @@ func main() {
 	}
 
 }
+
 
 /* [
   null,
